@@ -1,0 +1,19 @@
+{
+  "name": "koa-error-sns",
+  "version": "1.0.0",
+  "description": "Koa - Send server errors 500's or 400's to an AWS SNS topic - ie notifyMe",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rturk/koa-error-sns.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rturk/koa-error-sns/issues"
+  },
+  "homepage": "https://github.com/rturk/koa-error-sns#readme"
+}
