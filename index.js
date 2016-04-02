@@ -1,37 +1,33 @@
 /**
- * Koa log errors to AWS SNS topic.
+ * Middleware that log Koa errors to AWS SNS topic.
  */
 
-var humanize = require('humanize-number');
-
-//Expose the error logger.
-module.exports = koaErrorLogToSNS;
+import humanize from 'humanize-number';
 
 /**
  * Log error to AWS SNS Middleware.
  */
-function koaErrorLogToSNS(opts) {
-  return function *logger(next) {
+export default function koaErrorLogToSNS(opts) {
+  return async next => {}
     // Time the request date
     const start = new Date;
 
     try {
       yield next;
     } catch (err) {
-      // log uncaught downstream errors
-      log(this, start, null, err);
+      log(this, start, null, err); // Log Uncaught Downstream errors
       throw err;
     }
 
-    var length = this.response.length || 'NA';
-    var body = this.body || 'NA';
+    const length = this.response.length || 'NA';
+    const body = this.body || 'NA';
 
     // Log when the response is finished or closed, whichever happens first.
-    var ctx = this;
-    var res = this.res;
+    const ctx = this;
+    const res = this.res;
 
-    var onfinish = done.bind(null, 'finish');
-    var onclose = done.bind(null, 'close');
+    const onfinish = done.bind(null, 'finish');
+    const onclose = done.bind(null, 'close');
 
     res.once('finish', onfinish);
     res.once('close', onclose);
@@ -45,7 +41,7 @@ function koaErrorLogToSNS(opts) {
 }
 
 /**
- * Log helper.
+ * Log Koa errors to AWS SNS helper.
  */
 
 function log(ctx, start, length, err, event) {
@@ -64,12 +60,14 @@ function log(ctx, start, length, err, event) {
         delta: time(start),
         length,
     };
+    //TODO: Send to AWS S3
 
   }
 }
 
 /**
- * Calculate the response time in a human readable format.
+ * Helper funtion
+ * Calculates the response time in a human readable format.
  * In milliseconds if less than 10 seconds,
  * in seconds otherwise.
  */

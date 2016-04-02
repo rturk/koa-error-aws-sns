@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/rturk/koa-error-sns/issues"
   },
-  "homepage": "https://github.com/rturk/koa-error-sns#readme"
+  "homepage": "https://github.com/rturk/koa-error-sns#readme",
+  "dependencies": {
+    "aws-sdk": "^2.3.0"
+  }
 }
