@@ -8,19 +8,22 @@ import humanize from 'humanize-number';
  * Log error to AWS SNS Middleware.
  */
 export default function koaErrorLogToSNS({sns, TargetArn}) {
+  console.log("koaErrorLogToSNS: setup...");
   return async (ctx, next) => {
-    // Time the request date
+    // Time the request start
     const start = new Date;
 
-    if(sns && TargetArn) {
+    // if(sns && TargetArn) {
+    if(sns) {
       try {
         await next();
       } catch (err) {
-        await log(sns, TargetArn, ctx, start, null, err); // Log Uncaught Downstream errors
+        console.log("koaErrorLogToSNS: Error detected");
+        log(sns, ctx, start, err); // Log Uncaught Downstream errors
         throw err;
       }
     } else {
-      throw "Koa Error AWS SNS needs a SNS object and a Target Arn"
+      throw "Koa Error AWS SNS needs a SNS object"
     }
   }
 }
@@ -29,32 +32,59 @@ export default function koaErrorLogToSNS({sns, TargetArn}) {
  * Log Koa errors to AWS SNS helper.
  */
 
-async function log(sns, TargetArn, ctx, start, length, err, event) {
+function log(sns, ctx, start, error) {
 
-  //Only log >= 400
-  if(err.status >= 400) {
+  console.log("koaErrorLogToSNS: Log..!");
     const end = new Date;
 
-    const Message = {
-        event,
-        method: ctx.method,
-        originalUrl: ctx.originalUrl,
-        status,
-        start,
-        end,
-        delta: time(start),
-        length,
+    const request = {
+      headers: ctx.headers || 'NA',
+      method: ctx.method || 'NA',
+      url: ctx.url || 'NA',
+      originalUrl: ctx.originalUrl || 'NA',
+      origin: ctx.origin || 'NA',
+      href: ctx.href || 'NA',
+      path: ctx.path || 'NA',
+      query: ctx.query || 'NA',
+      querystring: ctx.querystring || 'NA',
+      host: ctx.host || 'NA',
+      hostname: ctx.hostname || 'NA',
+      protocol: ctx.protocol || 'NA',
+      ip: ctx.ip || 'NA',
+      ips: ctx.ips || 'NA',
+      subdomains: ctx.subdomains || 'NA',
+      secure: ctx.secure || 'NA',
     };
-    console.log('mid error message: ', message);
+    const response = {
+      // body: ctx.body || 'NA',
+      status: ctx.status || 'NA',
+      message: ctx.message || 'NA',
+      length: ctx.length || 'NA',
+      type: ctx.type || 'NA',
+    };
 
-    data = await sns.publish({
-      TargetArn,
-      Message,
-      MessageStructure: 'json',
+    const message = {
+      request,
+      response,
+      error: {  error: error || 'NA',
+                stack: JSON.stringify(error.stack) || 'NA',
+      },
+      date: { start,
+              end,
+              delta: time(start,end),
+      },
+    };
+
+    sns.publish({
+      Subject: "KOA Server Error",
+      Message : JSON.stringify(message),
+    },
+    function(err, data) {
+        if(!err) {
+          console.log("Server error sent to AWS SNS", data);
+        }
     });
 
-    console.log('push sent: ', data);
-  }
 }
 
 /**
