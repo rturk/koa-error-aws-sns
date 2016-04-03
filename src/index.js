@@ -3,40 +3,42 @@
  */
 
 import humanize from 'humanize-number';
+import AWS from 'aws-sdk';
 
 /**
  * Log error to AWS SNS Middleware.
  */
 export default function koaErrorLogToSNS(opts) {
-  return async next => {}
+  return async (ctx, next) => {
     // Time the request date
     const start = new Date;
 
     try {
-      yield next;
+      await next();
     } catch (err) {
-      log(this, start, null, err); // Log Uncaught Downstream errors
+      log(ctx, start, null, err); // Log Uncaught Downstream errors
       throw err;
     }
 
-    const length = this.response.length || 'NA';
-    const body = this.body || 'NA';
 
-    // Log when the response is finished or closed, whichever happens first.
-    const ctx = this;
-    const res = this.res;
-
-    const onfinish = done.bind(null, 'finish');
-    const onclose = done.bind(null, 'close');
-
-    res.once('finish', onfinish);
-    res.once('close', onclose);
-
-    function done(event){
-      res.removeListener('finish', onfinish);
-      res.removeListener('close', onclose);
-      log(ctx, start, length, null, event);
-    }
+    // const length = this.response.length || 'NA';
+    // const body = this.body || 'NA';
+    //
+    // // Log when the response is finished or closed, whichever happens first.
+    // const ctx = this;
+    // const res = this.res;
+    //
+    // const onfinish = done.bind(null, 'finish');
+    // const onclose = done.bind(null, 'close');
+    //
+    // res.once('finish', onfinish);
+    // res.once('close', onclose);
+    //
+    // function done(event){
+    //   res.removeListener('finish', onfinish);
+    //   res.removeListener('close', onclose);
+    //   log(ctx, start, length, null, event);
+    // }
   }
 }
 
@@ -50,7 +52,7 @@ function log(ctx, start, length, err, event) {
   if((err.status == 500) || (ctx.status == 404) ) {
     const end = new Date;
 
-    message = {
+    const message = {
         event,
         method: ctx.method,
         originalUrl: ctx.originalUrl,
@@ -61,7 +63,7 @@ function log(ctx, start, length, err, event) {
         length,
     };
     //TODO: Send to AWS S3
-
+    console.log('mid error message: ', message);
   }
 }
 
@@ -73,7 +75,7 @@ function log(ctx, start, length, err, event) {
  */
 
 function time(start,end) {
-  var delta = end - start;
+  let delta = end - start;
   delta = delta < 10000
     ? delta + 'ms'
     : Math.round(delta / 1000) + 's';
