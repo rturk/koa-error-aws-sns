@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/rturk/koa-error-aws-sns#readme",
   "dependencies": {
-    "aws-sdk": "^2.3.0",
     "humanize-number": "0.0.2"
+  },
+  "peerDependencies": {
+    "aws-sdk": "2.x.x"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",

@@ -3,42 +3,25 @@
  */
 
 import humanize from 'humanize-number';
-import AWS from 'aws-sdk';
 
 /**
  * Log error to AWS SNS Middleware.
  */
-export default function koaErrorLogToSNS(opts) {
+export default function koaErrorLogToSNS({sns, TargetArn}) {
   return async (ctx, next) => {
     // Time the request date
     const start = new Date;
 
-    try {
-      await next();
-    } catch (err) {
-      log(ctx, start, null, err); // Log Uncaught Downstream errors
-      throw err;
+    if(sns && TargetArn) {
+      try {
+        await next();
+      } catch (err) {
+        await log(sns, TargetArn, ctx, start, null, err); // Log Uncaught Downstream errors
+        throw err;
+      }
+    } else {
+      throw "Koa Error AWS SNS needs a SNS object and a Target Arn"
     }
-
-
-    // const length = this.response.length || 'NA';
-    // const body = this.body || 'NA';
-    //
-    // // Log when the response is finished or closed, whichever happens first.
-    // const ctx = this;
-    // const res = this.res;
-    //
-    // const onfinish = done.bind(null, 'finish');
-    // const onclose = done.bind(null, 'close');
-    //
-    // res.once('finish', onfinish);
-    // res.once('close', onclose);
-    //
-    // function done(event){
-    //   res.removeListener('finish', onfinish);
-    //   res.removeListener('close', onclose);
-    //   log(ctx, start, length, null, event);
-    // }
   }
 }
 
@@ -46,13 +29,13 @@ export default function koaErrorLogToSNS(opts) {
  * Log Koa errors to AWS SNS helper.
  */
 
-function log(ctx, start, length, err, event) {
+async function log(sns, TargetArn, ctx, start, length, err, event) {
 
-  //Only log 500 & 404
-  if((err.status == 500) || (ctx.status == 404) ) {
+  //Only log >= 400
+  if(err.status >= 400) {
     const end = new Date;
 
-    const message = {
+    const Message = {
         event,
         method: ctx.method,
         originalUrl: ctx.originalUrl,
@@ -62,8 +45,15 @@ function log(ctx, start, length, err, event) {
         delta: time(start),
         length,
     };
-    //TODO: Send to AWS S3
     console.log('mid error message: ', message);
+
+    data = await sns.publish({
+      TargetArn,
+      Message,
+      MessageStructure: 'json',
+    });
+
+    console.log('push sent: ', data);
   }
 }
 
