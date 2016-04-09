@@ -1,9 +1,10 @@
 # koa-error-sns
-This Middleware detects errors in Koa Servers and sends messages to an AWS SNS topic. From SNS you can set up different subscribers; such as email subscribers address, SQS queues or Lambda function. Simple use case is subscribe an email address to the SNS topic that will receive all error messages.
+This Middleware detects errors in Koa Servers and sends messages to an AWS SNS topic. SNS is a fan-out message distribution system from AWS. From SNS you can set up different subscribers; such as email subscribers address, SQS queues or Lambda function. Simple use case is subscribe an email address to the SNS topic that will receive all error messages.
 
 ## How it works
-The Middleware will listen to errors thrown from downstream components using try & catch. Once an error is detected a message containing error detail as well other relevant information (context, request and whenever possible response information) is published to your SNS endpoint.
-The Middleware code is lightweight and is intended to be used in production environments. 
+The Middleware will listen to errors thrown from downstream components using try & catch. Once an error is detected a message containing error detail as well other relevant information (context, request and whenever possible response information) will be published to your SNS endpoint.
+
+The Middleware code is lightweight and is intended to be used in production environments. AWS is only called when an error is detected.
 
 Please note that this middleware will solely catch errors from downstream components, so in order to catch relevant errors it must be one of the first middleware installed the Koa initialization stack.
 

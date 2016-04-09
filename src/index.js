@@ -2,25 +2,26 @@
  * Middleware that log Koa errors to AWS SNS topic.
  */
 
-import humanize from 'humanize-number';
-
-/**
- * Log error to AWS SNS Middleware.
- */
-export default function koaErrorLogToSNS({sns, TargetArn}) {
-  console.log("koaErrorLogToSNS: setup...");
+export default function koaErrorLogToSNS({sns, options}) {
+  console.log("koaErrorLogToSNS: Setting up...");
   return async (ctx, next) => {
-    // Time the request start
-    const start = new Date;
 
-    // if(sns && TargetArn) {
+    const start = new Date; // Time the request started
+
+    // if(options) {
+    //   //Placeholder for future options. Work in progress
+    // }
     if(sns) {
       try {
         await next();
-      } catch (err) {
-        console.log("koaErrorLogToSNS: Error detected");
-        log(sns, ctx, start, err); // Log Uncaught Downstream errors
-        throw err;
+      } catch (error) {
+
+        //Error detected. Send error to SNS
+        logToSNS(sns, ctx, start, error);
+
+        // Throw error so upstream components will also catch it. This plugin is meant be nonintrusive, this means that this plugin
+        // will not disrupt error throw flow. If there are other plugins listening for errors, they will also be able to catch it.
+        throw error;
       }
     } else {
       throw "Koa Error AWS SNS needs a SNS object"
@@ -32,9 +33,9 @@ export default function koaErrorLogToSNS({sns, TargetArn}) {
  * Log Koa errors to AWS SNS helper.
  */
 
-function log(sns, ctx, start, error) {
+function logToSNS(sns, ctx, start, error) {
 
-  console.log("koaErrorLogToSNS: Log..!");
+  console.log("koaErrorLogToSNS: Log..");
     const end = new Date;
 
     const request = {
@@ -75,22 +76,17 @@ function log(sns, ctx, start, error) {
       },
     };
 
-    sns.publish({
+    await sns.publish({
       Subject: "KOA Server Error",
       Message : JSON.stringify(message),
-    },
-    function(err, data) {
-        if(!err) {
-          console.log("Server error sent to AWS SNS", data);
-        }
     });
+    console.log("Server error sent to AWS SNS", data);
 
 }
 
 /**
  * Helper funtion
- * Calculates the response time in a human readable format.
- * In milliseconds if less than 10 seconds,
+ * Returns the response time in milliseconds if less than 10 seconds,
  * in seconds otherwise.
  */
 
@@ -99,5 +95,5 @@ function time(start,end) {
   delta = delta < 10000
     ? delta + 'ms'
     : Math.round(delta / 1000) + 's';
-  return humanize(delta);
+  return delta;
 }

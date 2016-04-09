@@ -1,6 +1,6 @@
 {
   "name": "koa-error-aws-sns",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Koa - Send server errors 500's or 400's to an AWS SNS topic - ie notifyMe",
   "main": "lib/index.js",
   "scripts": {
@@ -19,10 +19,9 @@
   },
   "homepage": "https://github.com/rturk/koa-error-aws-sns#readme",
   "dependencies": {
-    "humanize-number": "0.0.2"
   },
   "peerDependencies": {
-    "aws-sdk": "2.x.x"
+    "aws-sdk": "ˆ2.3.2"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
