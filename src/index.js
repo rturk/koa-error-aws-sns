@@ -33,7 +33,7 @@ export default function koaErrorLogToSNS({sns, options}) {
  * Log Koa errors to AWS SNS helper.
  */
 
-function logToSNS(sns, ctx, start, error) {
+async function logToSNS(sns, ctx, start, error) {
 
   console.log("koaErrorLogToSNS: Log..");
     const end = new Date;

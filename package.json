@@ -1,7 +1,7 @@
 {
   "name": "koa-error-aws-sns",
   "version": "0.0.2",
-  "description": "Koa - Send server errors 500's or 400's to an AWS SNS topic - ie notifyMe",
+  "description": "Koa - Send server errors to an AWS SNS topic - ie notifyMe",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,7 +21,7 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "aws-sdk": "ˆ2.3.2"
+    "aws-sdk": "^2.3.2"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
