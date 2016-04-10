@@ -18,5 +18,5 @@ const sns = new AWS.SNS({ params: { TopicArn: 'arn:aws:sns:us-east-1:12345678910
                         });
 
 const app = new Koa();
-app.use(errorToSNS(sns, TargetArn);
+app.use(errorToSNS(sns);
 ```
