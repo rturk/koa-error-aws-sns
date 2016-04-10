@@ -8,6 +8,21 @@ The Middleware code is lightweight and is intended to be used in production envi
 
 Please note that this middleware will solely catch errors from downstream components, so in order to catch relevant errors it must be one of the first middleware installed the Koa initialization stack.
 
+
+## Installation
+
+```js
+$ npm install koa-error-aws-sns --save
+```
+
+If don't have AWS nodejs SDK installed you'll also need to install it as a peer dependency
+
+```js
+$ npm install aws-sdk --save
+```
+
+Please install AWS 2.3.X or greater since promise support is required
+
 ## Usage
 ```js
 import errorToSNS from 'koa-error-aws-sns';
