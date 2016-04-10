@@ -2,8 +2,8 @@
  * Middleware that log Koa errors to AWS SNS topic.
  */
 
-export default function koaErrorLogToSNS({sns, options}) {
-  console.log("koaErrorLogToSNS: Setting up...");
+export default function koaErrorLogToSNS(sns, options) {
+  console.log("koa-error-aws-sns: Setting up...");
   return async (ctx, next) => {
 
     const start = new Date; // Time the request started
@@ -17,7 +17,7 @@ export default function koaErrorLogToSNS({sns, options}) {
       } catch (error) {
 
         //Error detected. Send error to SNS
-        logToSNS(sns, ctx, start, error);
+        await logToSNS(sns, ctx, start, error);
 
         // Throw error so upstream components will also catch it. This plugin is meant be nonintrusive, this means that this plugin
         // will not disrupt error throw flow. If there are other plugins listening for errors, they will also be able to catch it.
@@ -34,8 +34,8 @@ export default function koaErrorLogToSNS({sns, options}) {
  */
 
 async function logToSNS(sns, ctx, start, error) {
-
-  console.log("koaErrorLogToSNS: Log..");
+  try {
+    console.log("koa-error-aws-sns: Error detected...");
     const end = new Date;
 
     const request = {
@@ -79,9 +79,17 @@ async function logToSNS(sns, ctx, start, error) {
     await sns.publish({
       Subject: "KOA Server Error",
       Message : JSON.stringify(message),
-    });
-    console.log("Server error sent to AWS SNS", data);
+    },
+    function(err, data) {
+        if(!err) {
+          console.log("koa-error-aws-sns: Error message sent to SNS: ", data);
+        }
+    }
+    );
 
+  } catch (error) {
+    console.log("koa-error-aws-sns: Unable to send error message to SNS",error);
+  }
 }
 
 /**
