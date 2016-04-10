@@ -1,6 +1,6 @@
 {
   "name": "koa-error-aws-sns",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Koa - Send server errors to an AWS SNS topic - ie notifyMe",
   "main": "lib/index.js",
   "scripts": {

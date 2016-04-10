@@ -13,11 +13,10 @@ Please note that this middleware will solely catch errors from downstream compon
 import errorToSNS from 'koa-error-aws-sns';
 import AWS from 'aws-sdk';
 
-AWS.config.loadFromPath('./config.json');
-
-const sns = new AWS.SNS();
-const TargetArn = 'arn:aws:sns:us-west-1:302467918846:endpoint';
+const sns = new AWS.SNS({ params: { TopicArn: 'arn:aws:sns:us-east-1:12345678910101:endpoint' },
+                          region: 'us-east-1',
+                        });
 
 const app = new Koa();
-app.use(errorToSNS({sns, TargetArn});
+app.use(errorToSNS(sns, TargetArn);
 ```
