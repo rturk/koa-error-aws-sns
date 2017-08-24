@@ -1,4 +1,6 @@
 # koa-error-sns
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/rturk/koa-error-aws-sns.svg)](https://greenkeeper.io/)
 This Middleware detects errors in Koa Servers and sends messages to an AWS SNS topic. SNS is a fan-out message distribution system from AWS. From SNS you can set up different subscribers; such as email subscribers address, SQS queues or Lambda function. Simple use case is subscribe an email address to the SNS topic that will receive all error messages.
 
 ## How it works
